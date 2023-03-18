@@ -1,6 +1,6 @@
 # Wingman-Backend
 
-This is the backend code for the Wingman Dating app
+This is the backend code for the Wingman Dating app.
 Install all the required libraries using the command inside the project directory
 
 
