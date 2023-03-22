@@ -1,29 +1,33 @@
 import config
 from flask import Flask
-from random import randrange
 from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
-from flask import request,Response
+from models import db
 import json
-from flask import Flask, request, jsonify
-import os
-from werkzeug.utils import secure_filename
+from flask import request, Response
+from auth import (
+    register,
+    login,
+    logout
+)
 
 app = Flask(__name__)
-
 app.config['SQLALCHEMY_DATABASE_URI'] = config.DB_CONNECT_URL
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = config.SECRET_KEY
 
-db = SQLAlchemy(app)
+db.init_app(app)
 migrate = Migrate(app, db)
 
+# add the routes for the new endpoints
+app.route('/register', methods=['POST'])(register)
+app.route('/login', methods=['POST'])(login)
+app.route('/logout', methods=['POST'])(logout)
 
-
-class JsonModel(object):
+class BaseModel(object):
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
-
-class UsersModel(db.Model, JsonModel):
+class UsersModel(db.Model, BaseModel):
     __tablename__ = config.USERS_TABLE
 
     id = db.Column(db.Integer, primary_key=True)
@@ -76,10 +80,6 @@ class UsersModel(db.Model, JsonModel):
         self.essay7 = essay7
         self.essay8 = essay8
         self.essay9 = essay9
-        self.firstname = firstname
-
-        db.create_all()
-
 
 def fetch_users_data():
     return json.dumps([u.as_dict() for u in UsersModel.query.all()], default=str)
@@ -90,8 +90,9 @@ def index_startpage():
 
 @app.route('/usersdata')
 def get_users_data():
-    response = fetch_users_data()
-    return str(response)
+    return str(fetch_users_data())
 
 if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
     app.run()

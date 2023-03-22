@@ -5,3 +5,4 @@ mysql_connector_repackaged==0.3.1
 pandas==1.5.3
 pandas_stubs==1.2.0.35
 Werkzeug==2.2.3
+PyJWT
