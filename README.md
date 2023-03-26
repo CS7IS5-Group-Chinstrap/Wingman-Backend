@@ -16,5 +16,5 @@ or
 
 ## API's 
 
-*/usersdata* - Returns the data for all the users.
+*/usersdata* - Returns the data for all the users.<br/>
 */getSimilarUsers?userID={userID}* - Returns the data for the users similar to a given user (passed as userID in api query parameter) using K-means clustering
