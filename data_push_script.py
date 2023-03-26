@@ -1,7 +1,6 @@
 
 import json
 import pandas as pd
-import pandas as pd
 from datetime import datetime as dt
 import random
 import mysql.connector

@@ -1,8 +1,9 @@
-Flask==2.2.2
-Flask_Migrate==4.0.4
-flask_sqlalchemy==3.0.3
-mysql_connector_repackaged==0.3.1
-pandas==1.5.3
-pandas_stubs==1.2.0.35
-Werkzeug==2.2.3
+Flask
+Flask_Migrate
+flask_sqlalchemy
+mysql_connector_repackaged
+pandas
+pandas_stubs
+Werkzeug
 PyJWT
+scikit-learn

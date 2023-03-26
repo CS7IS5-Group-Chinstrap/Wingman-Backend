@@ -2,6 +2,8 @@ import config
 from flask import Flask
 from flask_migrate import Migrate
 from models import db
+import pandas as pd
+import KMeans
 import json
 from flask import request, Response
 from auth import (
@@ -84,15 +86,36 @@ class UsersModel(db.Model, BaseModel):
 def fetch_users_data():
     return json.dumps([u.as_dict() for u in UsersModel.query.all()], default=str)
 
+def fetch_users_data_as_list():
+    return [u.as_dict() for u in UsersModel.query.all()]
+
 @app.route('/')
 def index_startpage():
     return "Welcome To Our Wingman Backend Flask Application"
 
+# Gets all the users 
 @app.route('/usersdata')
 def get_users_data():
     return str(fetch_users_data())
 
+# Gets all the users similar to a given user (using userID as a api query parameter) using K-means clustering
+@app.route('/getSimilarUsers')
+def get_similar_users():
+    id = request.args.get('userID')
+    if not id:
+        response = "Please provide a user id at the end of URL (E.g ?userID=1)"      
+    else:
+         data = fetch_users_data_as_list()
+         df = pd.DataFrame(data)
+         response = KMeans.getSimilarUsers(df,id).to_json(orient = "records")
+         if not response:
+            response = "No Users to show at the moment" 
+   
+    
+    return str(response)
+
 if __name__ == "__main__":
+    
     with app.app_context():
         db.create_all()
     app.run()
