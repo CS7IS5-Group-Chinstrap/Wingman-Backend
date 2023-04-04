@@ -74,4 +74,5 @@ def login():
 
 @token_required
 def logout(current_user):
+    
     return jsonify({'message': f'Logged out user {current_user.email}'}), 200

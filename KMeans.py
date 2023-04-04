@@ -1,9 +1,10 @@
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 import pandas as pd
+import numpy as np
 
 def  getSimilarUsers(df,id):
-  
+    print(df.head())
     data = pd.DataFrame({
         'age': df['age'],
         'diet': df['diet'],
@@ -33,8 +34,12 @@ def  getSimilarUsers(df,id):
     # plt.show()
 
     # Find similar users 
-    user_index = df.id[df.id == id].index.tolist()[0]
-    print(user_index)
+    
+    try:
+        user_index = df.index[df['id'] == int(id)].tolist()[0]
+    except:
+        return []
+    
     cluster_label = kmeans.predict([X[user_index]])[0]
     similar_users = [i for i, label in enumerate(kmeans.labels_) if label == cluster_label and i != user_index]
     return df.iloc[similar_users]

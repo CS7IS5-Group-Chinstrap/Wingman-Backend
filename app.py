@@ -107,12 +107,14 @@ def get_similar_users():
     else:
          data = fetch_users_data_as_list()
          df = pd.DataFrame(data)
-         response = KMeans.getSimilarUsers(df,id).to_json(orient = "records")
-         if not response:
-            response = "No Users to show at the moment" 
-   
+         try:
+            response = KMeans.getSimilarUsers(df,id).to_json(orient = "records")
+         except:
+            response = "No Users to show at the moment"
     
     return str(response)
+
+
 
 if __name__ == "__main__":
     
