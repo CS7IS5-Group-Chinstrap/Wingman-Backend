@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from models import db
 import pandas as pd
 import KMeans
+import text_features
 import json
 from flask import request, Response
 from auth import (
@@ -89,6 +90,9 @@ def fetch_users_data():
 def fetch_users_data_as_list():
     return [u.as_dict() for u in UsersModel.query.all()]
 
+def fetch_user_data_by_id(user_id):
+    return UsersModel.query.get(user_id)
+
 @app.route('/')
 def index_startpage():
     return "Welcome To Our Wingman Backend Flask Application"
@@ -114,7 +118,19 @@ def get_similar_users():
     
     return str(response)
 
-
+@app.route('/getIceBreakers')
+def get_ice_breakers_for_user():
+    id = request.args.get('userID')
+    if not id:
+        response = "Please provide a user id at the end of URL (E.g ?userID=1)"
+    else:
+        user = fetch_user_data_by_id(user_id=id)
+        if user is not None:
+            # TODO : Pass the topics to the GPT model for sentences
+            response = text_features.extract_topics_per_user(user.as_dict())
+        else:
+            response = "User not found."
+    return str(response)
 
 if __name__ == "__main__":
     

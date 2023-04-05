@@ -7,3 +7,7 @@ pandas_stubs
 Werkzeug
 PyJWT
 scikit-learn
+spacy
+gensim
+textblob
+nltk
