@@ -107,30 +107,30 @@ def get_users_data():
 def get_similar_users():
     id = request.args.get('userID')
     if not id:
-        response = "Please provide a user id at the end of URL (E.g ?userID=1)"      
+        response = {'message': 'Please provide a user id at the end of URL (E.g ?userID=1)'}, 400
     else:
          data = fetch_users_data_as_list()
          df = pd.DataFrame(data)
          try:
             response = KMeans.getSimilarUsers(df,id).to_json(orient = "records")
          except:
-            response = "No Users to show at the moment"
+            response = {'message': 'No Users to show at the moment'}, 404
     
-    return str(response)
+    return response
 
 @app.route('/getIceBreakers')
 def get_ice_breakers_for_user():
     id = request.args.get('userID')
     if not id:
-        response = "Please provide a user id at the end of URL (E.g ?userID=1)"
+        response = {'message': 'Please provide a user id at the end of URL (E.g ?userID=1)'}, 400
     else:
         user = fetch_user_data_by_id(user_id=id)
         if user is not None:
             # TODO : Pass the topics to the GPT model for sentences
             response = text_features.extract_topics_per_user(user.as_dict())
         else:
-            response = "User not found."
-    return str(response)
+            response = {'message': 'User not found.'}, 404
+    return response
 
 if __name__ == "__main__":
     
