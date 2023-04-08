@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 
 def  getSimilarUsers(df,id):
-    print(df.head())
+    # print(df.head())
     data = pd.DataFrame({
         'age': df['age'],
         'diet': df['diet'],
@@ -41,6 +41,19 @@ def  getSimilarUsers(df,id):
         return []
     
     cluster_label = kmeans.predict([X[user_index]])[0]
-    similar_users = [i for i, label in enumerate(kmeans.labels_) if label == cluster_label and i != user_index]
+    user = df.iloc[user_index]
+    if user.orientation == 'straight':
+        if user.sex == 'm':
+            similar_users = [i for i, label in enumerate(kmeans.labels_) if label == cluster_label and i != user_index and df.iloc[i].orientation == 'straight' and df.iloc[i].sex == 'f'] 
+        else:
+            similar_users = [i for i, label in enumerate(kmeans.labels_) if label == cluster_label and i != user_index and df.iloc[i].orientation == 'straight' and df.iloc[i].sex == 'm']
+    
+    elif user.orientation == 'gay':
+        if user.sex == 'm':
+            similar_users = [i for i, label in enumerate(kmeans.labels_) if label == cluster_label and i != user_index and df.iloc[i].orientation == 'gay' and df.iloc[i].sex == 'm'] 
+        else:
+            similar_users = [i for i, label in enumerate(kmeans.labels_) if label == cluster_label and i != user_index and df.iloc[i].orientation == 'gay' and df.iloc[i].sex == 'f']
+    else :
+        similar_users = [i for i, label in enumerate(kmeans.labels_) if label == cluster_label and i != user_index and df.iloc[i].orientation == 'bisexual']    
     return df.iloc[similar_users]
 

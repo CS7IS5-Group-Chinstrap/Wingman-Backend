@@ -120,9 +120,9 @@ def extract_topics(tokenized_docs):
     # Extract topics from LDA model
     topics = lda_model.print_topics(num_words=5)
 
-    # Print topic and words associated with each topic - can be commented out
-    for index, topic in lda_model.show_topics(formatted=False, num_words= 5):
-        print('Topic: {} \nWords: {}'.format(index, '|'.join([w[0] for w in topic])))
+    # # Print topic and words associated with each topic - can be commented out
+    # for index, topic in lda_model.show_topics(formatted=False, num_words= 5):
+    #     print('Topic: {} \nWords: {}'.format(index, '|'.join([w[0] for w in topic])))
 
     # Extract dominant topic
     topics = []

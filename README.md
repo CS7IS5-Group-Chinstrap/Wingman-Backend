@@ -16,8 +16,9 @@ or
 
 ## API's 
 
-- */usersdata* - Returns the data for all the users.<br/>
+- */all-users* - Returns the data for all the users.<br/>
 
-- */getSimilarUsers?userID={userID}* - Returns the data for the users similar to a given user (passed as userID in api query parameter) using K-means clustering
+- */get-similar-users/{userID}* - Returns the data for the users similar to a given user (passed as userID in api eg: */get-similar-users/19* ) using K-means clustering
 
-- */getIceBreakers?userID={userID}* - Returns icebreakers from topics extracted from a given user's bio (user passed as userID in api query parameter) using Latent Dirichlet Allocation (LDA) in gensim.
+- */get-ice-breakers/{userID}* - Returns icebreakers from topics extracted from a given user's bio (user passed as userID in api eg: */get-ice-breakers/19*) using Latent Dirichlet Allocation (LDA) in gensim.
+

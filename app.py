@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from models import db
 import pandas as pd
 import KMeans
+from gpt import get_iceBreakers
 import text_features
 import json
 from flask import request, Response, jsonify
@@ -14,6 +15,7 @@ from auth import (
     login,
     logout
 )
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = config.DB_CONNECT_URL
@@ -38,33 +40,27 @@ def get_users_data():
     return str(UserModel.fetch_users_data())
 
 # Gets all the users similar to a given user (using userID as a api query parameter) using K-means clustering
-@app.route('/get-similar-users')
-def get_similar_users():
-    id = request.args.get('userID')
-    if not id:
-        response = {'message': 'Please provide a user id at the end of URL (E.g ?userID=1)'}, 400
-    else:
-         data = UserModel.fetch_users_data_as_list()
-         df = pd.DataFrame(data)
-         try:
-            response = KMeans.getSimilarUsers(df,id).to_json(orient = "records")
-         except:
-            response = {'message': 'No Users to show at the moment'}, 404
-    
+@app.route('/get-similar-users/<int:user_id>')
+def get_similar_users(user_id):
+    # id = request.args.get('userID')
+    data = UserModel.fetch_users_data_as_list()
+    df = pd.DataFrame(data)
+    try:
+        response = KMeans.getSimilarUsers(df,user_id).to_json(orient = "records")
+    except:
+        response = {'message': 'No Users to show at the moment'}, 404
+
     return response
 
-@app.route('/get-ice-breakers')
-def get_ice_breakers_for_user():
-    id = request.args.get('userID')
-    if not id:
-        response = {'message': 'Please provide a user id at the end of URL (E.g ?userID=1)'}, 400
+@app.route('/get-ice-breakers/<int:user_id>')
+def get_ice_breakers_for_user(user_id):
+    user = UserModel.fetch_user_data_by_id(user_id=user_id)
+    if user is not None:
+        topics = text_features.extract_topics_per_user(user.as_dict())
+        response = get_iceBreakers(topics)
+       
     else:
-        user = UserModel.fetch_user_data_by_id(user_id=id)
-        if user is not None:
-            # TODO : Pass the topics to the GPT model for sentences
-            response = text_features.extract_topics_per_user(user.as_dict())
-        else:
-            response = {'message': 'User not found.'}, 404
+        response = {'message': 'User not found.'}, 404
     return response
 
 @app.route('/update-user/<int:user_id>', methods=['PUT'])
