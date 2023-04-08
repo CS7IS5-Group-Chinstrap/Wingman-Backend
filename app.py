@@ -6,7 +6,9 @@ import pandas as pd
 import KMeans
 import text_features
 import json
-from flask import request, Response
+from flask import request, Response, jsonify
+from datetime import datetime
+from models import UserModel, SwipeModel, MatchModel, db
 from auth import (
     register,
     login,
@@ -58,6 +60,13 @@ class UsersModel(db.Model, BaseModel):
     essay8 = db.Column(db.String())
     essay9 = db.Column(db.String())
     firstname = db.Column(db.String())
+
+    def __init__(self, email, password):
+        self.email = email
+        self.password = password
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def __init__(self, age, sex, orientation, diet, drinks, education, ethnicity, job, location, pets, religion, sign, speaks, essay0, essay1, essay2, essay3, essay4, essay5, essay6, essay7, essay8, essay9, firstname):
         self.age = age
@@ -131,6 +140,112 @@ def get_ice_breakers_for_user():
         else:
             response = {'message': 'User not found.'}, 404
     return response
+
+@app.route('/users', methods=['GET'])
+def get_all_users():
+    users = UserModel.query.all()
+    return jsonify([u.as_dict() for u in users])
+
+@app.route('/update-user/<int:user_id>', methods=['PUT'])
+def update_user(user_id):
+    user = UserModel.query.filter_by(id=user_id).first()
+
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    name = request.json.get('name')
+    email = request.json.get('email')
+    password = request.json.get('password')
+    age = request.json.get('age')
+    sex = request.json.get('sex')
+    orientation = request.json.get('orientation')
+    diet = request.json.get('diet')
+    drinks = request.json.get('drinks')
+    location = request.json.get('location')
+    bio = request.json.get('bio')
+
+    if name:
+        user.name = name
+    if email:
+        user.email = email
+    if password:
+        user.password = password
+    if age:
+        user.age = age
+    if sex:
+        user.sex = sex
+    if orientation:
+        user.orientation = orientation
+    if diet:
+        user.diet = diet
+    if drinks:
+        user.drinks = drinks
+    if location:
+        user.location = location
+    if bio:
+        user.bio = bio
+
+    db.session.commit()
+
+    return jsonify({'message': 'User updated successfully'})
+
+@app.route('/add-swipe', methods=['POST'])
+def submit_swipe():
+    user_id = request.json.get('user_id')
+    swiped_user_id = request.json.get('swiped_user_id')
+    swipe_type = request.json.get('swipe_type')
+
+    new_swipe = SwipeModel(user_id=user_id, swiped_user_id=swiped_user_id, swipe_type=swipe_type)
+    db.session.add(new_swipe)
+    db.session.commit()
+
+    # Check for matches
+    match = SwipeModel.query.filter_by(user_id=swiped_user_id, swiped_user_id=user_id, swipe_type='right').first()
+    if match:
+        # Create a new match object
+        new_match = MatchModel(user1_id=user_id, user2_id=swiped_user_id)
+        db.session.add(new_match)
+        db.session.commit()
+
+        # Notify both users of the match
+        user1 = UserModel.query.get(user_id)
+        user2 = UserModel.query.get(swiped_user_id)
+
+        # Send a message or notification to both users
+        send_notification(user1, user2)
+
+    return jsonify({'message': 'Swipe submitted successfully', "match": new_match })
+
+@app.route('/matches/<int:user_id>', methods=['GET'])
+def get_matches(user_id):
+    matches = MatchModel.query.filter((MatchModel.user1_id == user_id) | (MatchModel.user2_id == user_id)).all()
+
+    matched_users = []
+    for match in matches:
+        if match.user1_id == user_id:
+            matched_users.append(UserModel.query.get(match.user2_id))
+        else:
+            matched_users.append(UserModel.query.get(match.user1_id))
+
+    return jsonify([u.as_dict() for u in matched_users])
+
+
+from flask_mail import Mail, Message
+
+mail = Mail()
+
+def send_notification(user1, user2):
+    # Get the email addresses of both users
+    user1_email = user1.email
+    user2_email = user2.email
+
+    # Create the email message
+    msg = Message('New Match!', recipients=[user1_email, user2_email])
+    msg.body = f'Congratulations, {user1.name} and {user2.name}! You have a new match on our dating app.'
+
+    # Send the email
+    mail.send(msg)
+
 
 if __name__ == "__main__":
     
