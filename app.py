@@ -146,7 +146,7 @@ def get_matches(user_id):
                               .with_entities(MatchModel.user1_id, MatchModel.user2_id) \
                               .distinct() \
                               .all()
-
+    
     matched_users = []
     for match in matches:
         if match.user1_id == user_id:

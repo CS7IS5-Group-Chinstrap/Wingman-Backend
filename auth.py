@@ -46,11 +46,10 @@ def register():
     db.session.add(new_user)
     try:
         db.session.commit()
+        return jsonify({'message': 'New user created!', 'user_id':new_user.id})
     except IntegrityError as e:
         db.session.rollback()
         return jsonify({'message': 'Failed to create new user'}), 500
-
-    return jsonify({'message': 'New user created!'})
 
 def login():
     auth = request.authorization
@@ -68,7 +67,7 @@ def login():
             {'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
             current_app.config['SECRET_KEY'], algorithm='HS256')
 
-        return jsonify({'message': 'Successfully Logged In', 'token': token}), 200
+        return jsonify({'message': 'Successfully Logged In', 'token': token, 'user_id':user.id}), 200
     else:
         return jsonify({'message': 'Could not verify', 'WWW-Authenticate': 'Basic auth="Login required"'}), 401 
 
