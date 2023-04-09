@@ -41,10 +41,15 @@ class UserModel(db.Model, BaseModel):
     password = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def __init__(self, email, password, name):
+    def __init__(self, email, password, name, age,sex, orientation, diet, drinks):
         self.email = email
         self.firstname = name
         self.password = password
+        self.age = age
+        self.sex = sex
+        self.orientation = orientation
+        self.diet = diet
+        self.drinks = drinks
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
