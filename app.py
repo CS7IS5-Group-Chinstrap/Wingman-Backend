@@ -45,7 +45,7 @@ def get_users_data():
 
 # Gets all the users 
 @app.route('/user/<int:user_id>')
-def get_users_data(user_id):
+def get_user(user_id):
     user = UserModel.fetch_user_data_by_id(user_id)
     if user is None:
         return jsonify({'error': 'User not found'}), 404
