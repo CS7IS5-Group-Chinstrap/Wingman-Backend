@@ -1,6 +1,7 @@
 import config
 from flask import Flask
 from flask_migrate import Migrate
+from sqlalchemy import or_, distinct
 from models import db
 import pandas as pd
 import KMeans
@@ -10,6 +11,7 @@ import json
 from flask import request, Response, jsonify
 from datetime import datetime
 from models import UserModel, SwipeModel, MatchModel, db
+from werkzeug.security import generate_password_hash
 from auth import (
     register,
     login,
@@ -63,9 +65,10 @@ def get_ice_breakers_for_user(user_id):
         response = {'message': 'User not found.'}, 404
     return response
 
-@app.route('/update-user/<int:user_id>', methods=['PUT'])
-def update_user(user_id):
-    user = UserModel.query.filter_by(id=user_id).first()
+@app.route('/update-user', methods=['PUT'])
+def update_user():
+    id = request.args.get('userID')
+    user = UserModel.query.filter_by(id=id).first()
 
     if not user:
         return jsonify({'message': 'User not found'}), 404
@@ -86,7 +89,8 @@ def update_user(user_id):
     if email:
         user.email = email
     if password:
-        user.password = password
+        hash_password = generate_password_hash(password, method='sha256')
+        user.password = hash_password
     if age:
         user.age = age
     if sex:
@@ -114,28 +118,24 @@ def add_swipe():
 
     new_swipe = SwipeModel(user_id=user_id, swiped_user_id=swiped_user_id, swipe_type=swipe_type)
     db.session.add(new_swipe)
-    db.session.commit()
-
+    
     # Check for matches
-    match = SwipeModel.query.filter_by(user_id=swiped_user_id, swiped_user_id=user_id, swipe_type='right').first()
+    match = SwipeModel.query.filter_by(user_id=swiped_user_id, swiped_user_id=user_id, swipe_type='right')
     if match:
-        # Create a new match object
         new_match = MatchModel(user1_id=user_id, user2_id=swiped_user_id)
         db.session.add(new_match)
         db.session.commit()
-
-        # Notify both users of the match
-        user1 = UserModel.query.get(user_id)
-        user2 = UserModel.query.get(swiped_user_id)
-
-        # Send a message or notification to both users
-        send_notification(user1, user2)
-
-    return jsonify({'message': 'Swipe submitted successfully', "match": new_match })
+        return jsonify({'message': 'Swipe submitted successfully', "match": new_match.to_dict()})
+    else:
+        new_match = None
+        return jsonify({'message': 'Swipe submitted successfully', "match": new_match})
 
 @app.route('/matches/<int:user_id>', methods=['GET'])
 def get_matches(user_id):
-    matches = MatchModel.query.filter((MatchModel.user1_id == user_id) | (MatchModel.user2_id == user_id)).all()
+    matches = MatchModel.query.filter(or_(MatchModel.user1_id == user_id, MatchModel.user2_id == user_id)) \
+                              .with_entities(MatchModel.user1_id, MatchModel.user2_id) \
+                              .distinct() \
+                              .all()
 
     matched_users = []
     for match in matches:
@@ -145,24 +145,6 @@ def get_matches(user_id):
             matched_users.append(UserModel.query.get(match.user1_id))
 
     return jsonify([u.as_dict() for u in matched_users])
-
-
-from flask_mail import Mail, Message
-
-mail = Mail()
-
-def send_notification(user1, user2):
-    # Get the email addresses of both users
-    user1_email = user1.email
-    user2_email = user2.email
-
-    # Create the email message
-    msg = Message('New Match!', recipients=[user1_email, user2_email])
-    msg.body = f'Congratulations, {user1.name} and {user2.name}! You have a new match on our dating app.'
-
-    # Send the email
-    mail.send(msg)
-
 
 if __name__ == "__main__":
     
