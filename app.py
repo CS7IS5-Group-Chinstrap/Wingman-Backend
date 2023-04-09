@@ -7,6 +7,7 @@ import pandas as pd
 import KMeans
 from gpt import get_iceBreakers
 import text_features
+from flask_cors import CORS
 import json
 from flask import request, Response, jsonify
 from datetime import datetime
@@ -20,6 +21,7 @@ from auth import (
 
 
 app = Flask(__name__)
+cors = CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = config.DB_CONNECT_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = config.SECRET_KEY
