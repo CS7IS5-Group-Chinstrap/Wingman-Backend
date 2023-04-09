@@ -43,6 +43,14 @@ def index_startpage():
 def get_users_data():
     return str(UserModel.fetch_users_data())
 
+# Gets all the users 
+@app.route('/user/<int:user_id>')
+def get_users_data(user_id):
+    user = UserModel.fetch_user_data_by_id(user_id)
+    if user is None:
+        return jsonify({'error': 'User not found'}), 404
+    return jsonify(user.as_dict())
+
 # Gets all the users similar to a given user (using userID as a api query parameter) using K-means clustering
 @app.route('/get-similar-users/<int:user_id>')
 def get_similar_users(user_id):
