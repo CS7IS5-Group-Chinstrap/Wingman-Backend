@@ -140,8 +140,7 @@ def extract_topics(tokenized_docs):
 # Function that cleans the corpus and extracts dominant topics from easy - customized to user
 def extract_topics_per_user(user_data):
     # Combine all the bio into one document
-    essay = user_data['essay0'] + user_data['essay1'] + user_data['essay2'] + user_data['essay3'] + user_data['essay4'] + user_data['essay5'] + user_data['essay6'] + user_data['essay7'] + user_data['essay8'] + user_data['essay9']
-
+    essay = user_data.get('essay0','') + user_data.get('essay1','') + user_data.get('essay2','') + user_data.get('essay3','') + user_data.get('essay4','') + user_data.get('essay5','') + user_data.get('essay6','') + user_data.get('essay7','') + user_data.get('essay8','') + user_data.get('essay9','')
     docs = clean_corpus(docs=essay)
     tokenized_docs = [[word for word in docs.split()]]
     topics = extract_topics(tokenized_docs=tokenized_docs)

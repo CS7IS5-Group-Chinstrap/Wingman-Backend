@@ -13,3 +13,4 @@ textblob
 nltk
 Flask-Mail
 openai
+flask_cors
