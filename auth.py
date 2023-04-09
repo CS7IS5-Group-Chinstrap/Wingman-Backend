@@ -1,10 +1,9 @@
 import jwt
-import datetime
 from functools import wraps
 from flask import request, jsonify, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import UserModel, db
-from datetime import datetime
+import datetime
 from sqlalchemy.exc import IntegrityError
 
 def token_required(f):
@@ -41,8 +40,7 @@ def register():
     new_user = UserModel(
         email=data['email'],
         name=data['name'],
-        password=hashed_password,
-        created_at=datetime.now()
+        password=hashed_password
     )
 
     db.session.add(new_user)

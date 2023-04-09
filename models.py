@@ -37,42 +37,46 @@ class UserModel(db.Model, BaseModel):
     essay8 = db.Column(db.String())
     essay9 = db.Column(db.String())
     firstname = db.Column(db.String())
-    name = db.Column(db.String())
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def __init__(self, email, password):
+    def __init__(self, email, password, name):
         self.email = email
+        self.firstname = name
         self.password = password
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
-    def __init__(self, age, sex, orientation, diet, drinks, education, ethnicity, job, location, pets, religion, sign, speaks, essay0, essay1, essay2, essay3, essay4, essay5, essay6, essay7, essay8, essay9, firstname):
-        self.age = age
-        self.sex = sex
-        self.orientation = orientation
-        self.diet = diet
-        self.drinks = drinks
-        self.education = education
-        self.ethnicity = ethnicity
-        self.job = job
-        self.location = location
-        self.pets = pets
-        self.religion = religion
-        self.sign = sign
-        self.speaks = speaks
-        self.essay0 = essay0
-        self.essay1 = essay1
-        self.essay2 = essay2
-        self.essay3 = essay3
-        self.essay4 = essay4
-        self.essay5 = essay5
-        self.essay6 = essay6
-        self.essay7 = essay7
-        self.essay8 = essay8
-        self.essay9 = essay9
+    # def __init__(self, age, sex, orientation, diet, drinks, education, ethnicity, job, location, pets, religion, sign, speaks, essay0, essay1, essay2, essay3, essay4, essay5, essay6, essay7, essay8, essay9, name, email, password):
+    #     self.age = age
+    #     self.sex = sex
+    #     self.orientation = orientation
+    #     self.diet = diet
+    #     self.drinks = drinks
+    #     self.education = education
+    #     self.ethnicity = ethnicity
+    #     self.job = job
+    #     self.location = location
+    #     self.pets = pets
+    #     self.religion = religion
+    #     self.sign = sign
+    #     self.speaks = speaks
+    #     self.essay0 = essay0
+    #     self.essay1 = essay1
+    #     self.essay2 = essay2
+    #     self.essay3 = essay3
+    #     self.essay4 = essay4
+    #     self.essay5 = essay5
+    #     self.essay6 = essay6
+    #     self.essay7 = essay7
+    #     self.essay8 = essay8
+    #     self.essay9 = essay9
+    #     self.name = name
+    #     self.email = email
+    #     self.password = password
+    #     self.
 
     def fetch_users_data():
         return json.dumps([u.as_dict() for u in UserModel.query.all()], default=str)
