@@ -40,6 +40,7 @@ def register():
 
     new_user = UserModel(
         email=data['email'],
+        name=data['name'],
         password=hashed_password,
         created_at=datetime.now()
     )
