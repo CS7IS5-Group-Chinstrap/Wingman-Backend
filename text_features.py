@@ -8,6 +8,7 @@ from nltk.stem import WordNetLemmatizer
 import re
 import string
 
+nltk.download('wordnet')
 nltk.download('stopwords')
 # Load stop words
 stop_words = set(nltk.corpus.stopwords.words('english'))
