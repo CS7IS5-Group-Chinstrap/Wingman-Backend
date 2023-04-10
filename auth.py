@@ -40,7 +40,7 @@ def register():
 
     new_user = UserModel(
         email=data['email'],
-        name=data['name'],
+        firstname=data['name'],
         age = 0,
         sex = 'f',
         orientation = 'straight',

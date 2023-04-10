@@ -83,6 +83,8 @@ def update_user():
     if not user:
         return jsonify({'message': 'User not found'}), 404
 
+
+    print(request.json.get('name'))
     name = request.json.get('name')
     email = request.json.get('email')
     password = request.json.get('password')
@@ -95,7 +97,7 @@ def update_user():
     bio = request.json.get('bio')
 
     if name:
-        user.name = name
+        user.firstname = name
     if email:
         user.email = email
     if password:
