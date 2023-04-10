@@ -51,8 +51,11 @@ def register():
 
     db.session.add(new_user)
     try:
+        token = jwt.encode(
+            {'id': new_user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
+            current_app.config['SECRET_KEY'], algorithm='HS256')
         db.session.commit()
-        return jsonify({'message': 'New user created!', 'user_id':new_user.id, 'user':new_user.as_dict()})
+        return jsonify({'message': 'New user created!', 'token': token, 'user_id':new_user.id, 'user':new_user.as_dict()})
     except IntegrityError as e:
         db.session.rollback()
         return jsonify({'message': 'Failed to create new user'}), 500
