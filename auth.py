@@ -40,13 +40,12 @@ def register():
 
     new_user = UserModel(
         email=data['email'],
-        firstname=data['name'],
+        name=data['name'],
         age = 0,
         sex = 'f',
         orientation = 'straight',
         diet  = 'anything',
         drinks = 'socially',
-        
         password=hashed_password
     )
 
