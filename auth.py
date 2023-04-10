@@ -3,6 +3,7 @@ from functools import wraps
 from flask import request, jsonify, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import UserModel, db
+import json
 import datetime
 from sqlalchemy.exc import IntegrityError
 
@@ -52,7 +53,7 @@ def register():
     db.session.add(new_user)
     try:
         db.session.commit()
-        return jsonify({'message': 'New user created!', 'user_id':new_user.id})
+        return jsonify({'message': 'New user created!', 'user':new_user.as_dict()})
     except IntegrityError as e:
         db.session.rollback()
         return jsonify({'message': 'Failed to create new user'}), 500
@@ -64,7 +65,8 @@ def login():
         return jsonify({'message': 'Could not verify 1', 'WWW-Authenticate': 'Basic auth="Login required"'}), 401
 
     user = UserModel.query.filter_by(email=auth.username).first()
-
+    # userJson = json.dumps(user)
+    # print(userJson)
     if not user:
         return jsonify({'message': 'User not found', 'WWW-Authenticate': 'Basic auth="Login required"'}), 401
 
@@ -72,8 +74,8 @@ def login():
         token = jwt.encode(
             {'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
             current_app.config['SECRET_KEY'], algorithm='HS256')
-
-        return jsonify({'message': 'Successfully Logged In', 'token': token, 'user_id':user.id}), 200
+        
+        return jsonify({'message': 'Successfully Logged In', 'token': token, 'user': user.as_dict()}), 200
     else:
         return jsonify({'message': 'Could not verify', 'WWW-Authenticate': 'Basic auth="Login required"'}), 401 
 
