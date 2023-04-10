@@ -24,7 +24,7 @@ def get_response(messages):
     # icebreakers = [choice.text.strip() for choice in completions.choices]
 
   response = openai.ChatCompletion.create(
-  model="gpt-3.5-turbo",
+  model="text-davinci-002",
   temperature=0.5,
   messages=messages
 )
