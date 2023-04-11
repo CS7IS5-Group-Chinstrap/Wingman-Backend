@@ -40,9 +40,6 @@ def get_iceBreakers(topics):
         lines = re.split(r'\d+\.\s*\"', response)[1:]
         # print(lines)
         response = [line[:-2] for line in lines]
-        response = ["Hey there! I couldn't help but notice your love for travel. If you could go anywhere in the world, where would you go and why?",
-                "Hi! Your profile caught my attention because of your love for music. What's your favorite concert or festival you've ever been to?"
-                "Hello! I see that you're a foodie. What's your favorite restaurant in the city and what's the best thing on the menu?"]
         
     except:
        response = ["Hey there! I couldn't help but notice your love for travel. If you could go anywhere in the world, where would you go and why?",
