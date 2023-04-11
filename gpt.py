@@ -24,7 +24,7 @@ def get_response(messages):
     # icebreakers = [choice.text.strip() for choice in completions.choices]
 
   response = openai.ChatCompletion.create(
-  model="text-davinci-002",
+  model="gpt-3.5-turbo",
   temperature=0.5,
   messages=messages
 )
@@ -40,7 +40,8 @@ def get_iceBreakers(topics):
         # print(lines)
         response = [line[:-2] for line in lines]
         
-    except:
+    except Exception as ex:
+       print(ex)
        response = ["Hey there! I couldn't help but notice your love for travel. If you could go anywhere in the world, where would you go and why?",
                 "Hi! Your profile caught my attention because of your love for music. What's your favorite concert or festival you've ever been to?"
                 "Hello! I see that you're a foodie. What's your favorite restaurant in the city and what's the best thing on the menu?"]

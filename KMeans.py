@@ -12,6 +12,7 @@ def  getSimilarUsers(df,id):
         'orientation':df['orientation']
     })
 
+
     # Converting categorical features to numerical using label encoding
     label_encoder = LabelEncoder()
     data['diet'] = label_encoder.fit_transform(data['diet'])
@@ -42,6 +43,7 @@ def  getSimilarUsers(df,id):
     
     cluster_label = kmeans.predict([X[user_index]])[0]
     user = df.iloc[user_index]
+    loc = user.location
     if user.orientation == 'straight':
         if user.sex == 'm':
             similar_users = [i for i, label in enumerate(kmeans.labels_) if label == cluster_label and i != user_index and df.iloc[i].orientation == 'straight' and df.iloc[i].sex == 'f'] 
