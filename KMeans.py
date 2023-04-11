@@ -43,7 +43,7 @@ def  getSimilarUsers(df,id):
     
     cluster_label = kmeans.predict([X[user_index]])[0]
     user = df.iloc[user_index]
-    loc = user.location
+    # loc = user.location
     if user.orientation == 'straight':
         if user.sex == 'm':
             similar_users = [i for i, label in enumerate(kmeans.labels_) if label == cluster_label and i != user_index and df.iloc[i].orientation == 'straight' and df.iloc[i].sex == 'f'] 
